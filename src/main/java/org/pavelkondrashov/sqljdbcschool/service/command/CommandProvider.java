@@ -45,17 +45,30 @@ public class CommandProvider {
             menuItem = viewProvider.readInt();
 
             switch (menuItem) {
-                case FIND_GROUPS_WITH_STUDENTS_COUNT -> findGroupsWithStudentCount();
-                case FIND_STUDENTS_TO_COURSE_NAME -> findAllStudentsToCourseName();
-                case ADD_NEW_STUDENT -> addNewStudent();
-                case ADD_STUDENT_TO_COURSE -> addStudentToCourse();
-                case DELETE_STUDENT_BY_ID -> deleteStudentById();
-                case REMOVE_STUDENT_FROM_COURSE -> removeStudentFromCourse();
-                case EXIT -> {
+                case FIND_GROUPS_WITH_STUDENTS_COUNT:
+                    findGroupsWithStudentCount();
+                    break;
+                case FIND_STUDENTS_TO_COURSE_NAME:
+                    findAllStudentsToCourseName();
+                    break;
+                case ADD_NEW_STUDENT:
+                    addNewStudent();
+                    break;
+                case DELETE_STUDENT_BY_ID:
+                    deleteStudentById();
+                    break;
+                case ADD_STUDENT_TO_COURSE:
+                    addStudentToCourse();
+                    break;
+                case REMOVE_STUDENT_FROM_COURSE:
+                    removeStudentFromCourse();
+                    break;
+                case EXIT:
                     exit();
                     keepGoing = false;
-                }
-                default -> viewProvider.printError();
+                    break;
+                default:
+                    viewProvider.printError();
             }
         }
     }

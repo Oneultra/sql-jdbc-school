@@ -11,7 +11,7 @@ import static java.lang.System.lineSeparator;
 
 public class Controller {
     private static final String NEW_LINE = "\n";
-    private static final String MENU_SEPARATOR = "-".repeat(54);
+    private static final String MENU_SEPARATOR = "------------------------------";
 
     private static final String MAIN_MENU_TEXT = "Application main menu." + lineSeparator() + MENU_SEPARATOR
             + lineSeparator() + "1. Find all groups with less or equals student count" + lineSeparator()

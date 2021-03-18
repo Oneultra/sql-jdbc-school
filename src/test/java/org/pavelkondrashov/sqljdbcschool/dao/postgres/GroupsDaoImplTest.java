@@ -4,13 +4,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pavelkondrashov.sqljdbcschool.dao.GroupsDao;
 import org.pavelkondrashov.sqljdbcschool.domain.SQLConnector;
+import org.pavelkondrashov.sqljdbcschool.domain.exception.DBException;
 import org.pavelkondrashov.sqljdbcschool.domain.generate.DBGenerator;
 import org.pavelkondrashov.sqljdbcschool.entity.Group;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GroupsDaoImplTest {
     private final SQLConnector connector = new SQLConnector("src/test/resources/database.properties");
@@ -96,11 +103,37 @@ class GroupsDaoImplTest {
     }
 
     @Test
+    void deleteDyIdShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        GroupsDao groupsDao = new GroupsDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, () -> groupsDao.deleteById(1));
+    }
+
+    @Test
     void findAllByStudentNumberShouldReturnListOfGroupsWithSpecificCountOfStudents() {
         List<Group> expected = new ArrayList<>();
         expected.add(groupsDao.findById(2).orElse(null));
 
         List<Group> actual = groupsDao.findAllByStudentsNumber(2);
         assertThat(expected).isEqualTo(actual);
+    }
+
+    @Test
+    void findAllByParameterShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        GroupsDao groupsDao = new GroupsDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, () -> groupsDao.findAllByStudentsNumber(1));
     }
 }

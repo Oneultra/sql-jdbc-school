@@ -5,14 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.pavelkondrashov.sqljdbcschool.dao.CoursesDao;
 import org.pavelkondrashov.sqljdbcschool.dao.StudentsDao;
 import org.pavelkondrashov.sqljdbcschool.domain.SQLConnector;
+import org.pavelkondrashov.sqljdbcschool.domain.exception.DBException;
 import org.pavelkondrashov.sqljdbcschool.domain.generate.DBGenerator;
 import org.pavelkondrashov.sqljdbcschool.entity.Course;
 import org.pavelkondrashov.sqljdbcschool.entity.Student;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 class CourseDaoImplTest {
 
@@ -127,5 +134,18 @@ class CourseDaoImplTest {
         coursesDao.removeStudentFromCourse(1, 2);
         assertThat(studentsDao.findAllByCourseName("Music")).isNotEmpty();
         assertThat(studentsDao.findAllByCourseName("Music")).doesNotContain(student);
+    }
+
+    @Test
+    void removeStudentFromCourseShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        CoursesDao coursesDao = new CourseDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, () -> coursesDao.removeStudentFromCourse(1, 1));
     }
 }

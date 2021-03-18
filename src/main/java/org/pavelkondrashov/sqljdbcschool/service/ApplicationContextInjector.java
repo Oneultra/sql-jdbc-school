@@ -62,7 +62,6 @@ public class ApplicationContextInjector {
                 }
             }
         }
-
         return contextInjector;
     }
 
@@ -72,9 +71,5 @@ public class ApplicationContextInjector {
 
     public CommandProvider getCommandProvider() {
         return COMMAND_PROVIDER;
-    }
-
-    public SQLConnector getConnection() {
-        return CONNECTOR;
     }
 }

@@ -132,9 +132,9 @@ public abstract class AbstractCrudDaoImpl<E> implements CrudDao<E, Integer> {
     @Override
     public List<E> findAll() {
         try (Connection connection = connector.getConnection();
-             Statement statement = connection.createStatement()) {
-            List<E> entities = new ArrayList<>();
-            try (ResultSet resultSet = statement.executeQuery(findAllQuery)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(findAllQuery)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<E> entities = new ArrayList<>();
                 while (resultSet.next()) {
                     entities.add(mapResultSetToEntity(resultSet));
                 }

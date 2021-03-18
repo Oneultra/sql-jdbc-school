@@ -10,12 +10,17 @@ import org.pavelkondrashov.sqljdbcschool.domain.generate.DBGenerator;
 import org.pavelkondrashov.sqljdbcschool.entity.Course;
 import org.pavelkondrashov.sqljdbcschool.entity.Student;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class StudentsDaoImplTest {
     private final SQLConnector connector = new SQLConnector("src/test/resources/database.properties");
@@ -93,6 +98,19 @@ class StudentsDaoImplTest {
     }
 
     @Test
+    void findByIdShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        StudentsDao studentsDao = new StudentsDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, () -> studentsDao.findById(1));
+    }
+
+    @Test
     void findAllShouldReturnListOfStudentsWhenGetCorrectParameters() {
         List<Student> expected = new ArrayList<>();
         expected.add(studentsDao.findById(1).orElse(null));
@@ -100,6 +118,32 @@ class StudentsDaoImplTest {
 
         List<Student> actual = studentsDao.findAll(1, 2);
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void findAllPaginationShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        StudentsDao studentsDao = new StudentsDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, () -> studentsDao.findAll(1, 1));
+    }
+
+    @Test
+    void findAllShouldThrowsSQLExceptionWhenReceiveWrongConnection() throws SQLException {
+        SQLConnector mockedConnector = mock(SQLConnector.class);
+        Connection mockedConnection = mock(Connection.class);
+
+        when(mockedConnector.getConnection()).thenReturn(mockedConnection);
+        when(mockedConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        StudentsDao studentsDao = new StudentsDaoImpl(mockedConnector);
+
+        assertThrows(DBException.class, studentsDao::findAll);
     }
 
     @Test
